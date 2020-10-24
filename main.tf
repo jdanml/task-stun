@@ -18,11 +18,10 @@ module "aws-vpc" {
   default_tags             = var.default_tags
 }
 
-#module "aws-iam" {
-#  source = "./modules/iam"
-#
-#  aws_env_name= var.aws_env_name
-#}
+module "aws-iam" {
+  source = "./modules/iam"
+  aws_env_name= var.aws_env_name
+}
 
 module "ec2-keypair" {
   source = "./modules/ec2-keypair"
@@ -44,6 +43,7 @@ resource "aws_instance" "stun-server" {
   vpc_security_group_ids = module.aws-vpc.aws_security_group
 
   key_name = module.ec2-keypair.key_name
+  iam_instance_profile = module.aws-iam.stun-server-profile
 
   tags = merge(var.default_tags, map(
     "Name", "env-${var.aws_env_name}-stun-${count.index}",
