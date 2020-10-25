@@ -105,4 +105,4 @@ verbose
 lt-cred-mech
 user=task:pass123
 EOL
-turnserver -c /etc/turnserver.conf -o
+sudo turnserver -c /etc/turnserver.conf -o
