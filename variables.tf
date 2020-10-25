@@ -32,6 +32,10 @@ data "aws_ami" "distro" {
   owners = ["099720109477"] # Canonical
 }
 
+variable "dashboard_name" {
+  description = "Name of the CloudWatch dashboard"
+}
+
 variable "aws_stun_size" {
   description = "EC2 Instance Size of Stun servers"
 }

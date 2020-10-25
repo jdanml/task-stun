@@ -23,6 +23,13 @@ module "aws-iam" {
   aws_env_name= var.aws_env_name
 }
 
+module "monitoring" {
+  source = "./modules/cloudwatch"
+
+  dashboard_name           = var.dashboard_name
+}
+
+
 module "ec2-keypair" {
   source = "./modules/ec2-keypair"
 
@@ -44,6 +51,7 @@ resource "aws_instance" "stun-server" {
 
   key_name = module.ec2-keypair.key_name
   iam_instance_profile = module.aws-iam.stun-server-profile
+  user_data = file("user-data/stun-init.sh")
 
   tags = merge(var.default_tags, map(
     "Name", "env-${var.aws_env_name}-stun-${count.index}",
