@@ -13,7 +13,7 @@ variable "aws_avail_zones" {
 
 variable "aws_cidr_subnets_public" {
   description = "CIDR Blocks for public subnets in Availability zones"
-  type        = string
+  type        = list(string)
 }
 
 variable "default_tags" {

@@ -13,7 +13,7 @@ variable "aws_vpc_cidr_block" {
 
 variable "aws_cidr_subnets_public" {
   description = "CIDR Blocks for public subnets in Availability Zones"
-  type        = string
+  type        = list(string)
 }
 
 data "aws_ami" "distro" {

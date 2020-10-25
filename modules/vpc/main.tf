@@ -20,10 +20,9 @@ resource "aws_internet_gateway" "env-vpc-internetgw" {
 
 resource "aws_subnet" "env-vpc-subnets-public" {
   vpc_id            = aws_vpc.env-vpc.id
-  count             = 1
-#  count             = length(var.aws_avail_zones)
+  count             = length(var.aws_avail_zones)
   availability_zone = element(var.aws_avail_zones, count.index)
-  cidr_block        = var.aws_cidr_subnets_public
+  cidr_block        = element(var.aws_cidr_subnets_public, count.index)
 
   tags = merge(var.default_tags, map(
     "Name", "env-${var.aws_env_name}-${element(var.aws_avail_zones, count.index)}-public"
@@ -58,13 +57,39 @@ resource "aws_security_group" "env" {
   ))
 }
 
-resource "aws_security_group_rule" "allow-all-ingress" {
+resource "aws_security_group_rule" "stun-r1" {
   type              = "ingress"
-  from_port         = 0
-  to_port           = 65535
-  protocol          = "-1"
+  from_port         = 3478
+  to_port           = 3478
+  protocol          = "UDP"
   cidr_blocks       = ["0.0.0.0/0"]
-#  cidr_blocks       = [var.aws_vpc_cidr_block]
+  security_group_id = aws_security_group.env.id
+}
+
+resource "aws_security_group_rule" "stun-r1_1" {
+  type              = "ingress"
+  from_port         = 3478
+  to_port           = 3478
+  protocol          = "TCP"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.env.id
+}
+
+resource "aws_security_group_rule" "stun-r2" {
+  type              = "ingress"
+  from_port         = 5349
+  to_port           = 5349
+  protocol          = "UDP"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.env.id
+}
+
+resource "aws_security_group_rule" "stun-r2_2" {
+  type              = "ingress"
+  from_port         = 5349
+  to_port           = 5349
+  protocol          = "TCP"
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.env.id
 }
 

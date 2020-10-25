@@ -25,8 +25,7 @@ module "aws-iam" {
 
 module "monitoring" {
   source = "./modules/cloudwatch"
-
-  dashboard_name           = var.dashboard_name
+  dashboard_name = var.dashboard_name
 }
 
 
