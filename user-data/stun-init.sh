@@ -105,4 +105,5 @@ verbose
 lt-cred-mech
 user=task:pass123
 EOL
+sudo sed -i '/TURNSERVER_ENABLED/c\TURNSERVER_ENABLED=1' /etc/default/coturn
 sudo turnserver -c /etc/turnserver.conf -o
