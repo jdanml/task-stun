@@ -56,7 +56,9 @@ resource "aws_autoscaling_group" "stun-asg" {
 
   min_size             = 1
   desired_capacity     = 2
-  max_size             = 3
+  max_size             = 4
+
+  health_check_type    = "EC2"
   
   launch_configuration = aws_launch_configuration.stun-server.name
 
@@ -74,6 +76,12 @@ resource "aws_autoscaling_group" "stun-asg" {
 
   lifecycle {
     create_before_destroy = true
+  }
+
+    tag {
+    key                 = "Name"
+    value               = "web"
+    propagate_at_launch = true
   }
 }
 
