@@ -52,11 +52,11 @@ resource "aws_launch_configuration" "stun-server" {
 }
 
 resource "aws_autoscaling_group" "stun-asg" {
-  name = "${var.aws_env_name}-asg"
+  name = "env-${var.aws_env_name}-stun"
 
   min_size             = 1
   desired_capacity     = 2
-  max_size             = 2
+  max_size             = 3
   
   launch_configuration = aws_launch_configuration.stun-server.name
 
@@ -72,15 +72,59 @@ resource "aws_autoscaling_group" "stun-asg" {
 
   vpc_zone_identifier  = module.aws-vpc.aws_subnet_ids_public
 
-  # Required to redeploy without an outage.
   lifecycle {
     create_before_destroy = true
   }
+}
 
-  tags = merge(var.default_tags, map(
-    "Name", "env-${var.aws_env_name}-stun-${count.index}",
-    "Environment", "${var.aws_env_name}",
-    "Role", "stun-${var.aws_env_name}-${count.index}"
-  ))
+resource "aws_autoscaling_policy" "stun_policy_up" {
+  name = "stun_policy_up"
+  scaling_adjustment = 1
+  adjustment_type = "ChangeInCapacity"
+  cooldown = 200
+  autoscaling_group_name = aws_autoscaling_group.stun-asg.name
+}
 
+resource "aws_cloudwatch_metric_alarm" "stun_cpu_alarm_up" {
+  alarm_name = "stun_cpu_alarm_up"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods = "2"
+  metric_name = "CPUUtilization"
+  namespace = "AWS/EC2"
+  period = "120"
+  statistic = "Average"
+  threshold = "80"
+
+  dimensions = {
+    AutoScalingGroupName = aws_autoscaling_group.stun-asg.name
+  }
+
+  alarm_description = "This metric monitors EC2 instance CPU utilization"
+  alarm_actions = [ aws_autoscaling_policy.stun_policy_up.arn ]
+}
+
+resource "aws_autoscaling_policy" "stun_policy_down" {
+  name = "stun_policy_down"
+  scaling_adjustment = -1
+  adjustment_type = "ChangeInCapacity"
+  cooldown = 200
+  autoscaling_group_name = aws_autoscaling_group.stun-asg.name
+}
+
+resource "aws_cloudwatch_metric_alarm" "stun_cpu_alarm_down" {
+  alarm_name = "stun_cpu_alarm_down"
+  comparison_operator = "LessThanOrEqualToThreshold"
+  evaluation_periods = "2"
+  metric_name = "CPUUtilization"
+  namespace = "AWS/EC2"
+  period = "120"
+  statistic = "Average"
+  threshold = "10"
+
+  dimensions = {
+    AutoScalingGroupName = aws_autoscaling_group.stun-asg.name
+  }
+
+  alarm_description = "This metric monitor EC2 instance CPU utilization"
+  alarm_actions = [ aws_autoscaling_policy.stun_policy_down.arn  ]
 }
