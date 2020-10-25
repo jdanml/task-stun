@@ -80,7 +80,7 @@ resource "aws_autoscaling_group" "stun-asg" {
 
     tag {
     key                 = "Name"
-    value               = "web"
+    value               = "env-${var.aws_env_name}-stun"
     propagate_at_launch = true
   }
 }
