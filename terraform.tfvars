@@ -10,7 +10,6 @@ dashboard_name = "stun-dashboard"
 
 #Stun Server
 aws_stun_size = "t2.micro"
-aws_stun_server_num = 2
 
 default_tags = {
   #  Env = "devtest"
