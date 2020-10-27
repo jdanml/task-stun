@@ -54,7 +54,7 @@ resource "aws_launch_configuration" "stun-server" {
 resource "aws_autoscaling_group" "stun-asg" {
   name = "env-${var.aws_env_name}-stun"
 
-  min_size             = 1
+  min_size             = 2
   desired_capacity     = 2
   max_size             = 4
 
